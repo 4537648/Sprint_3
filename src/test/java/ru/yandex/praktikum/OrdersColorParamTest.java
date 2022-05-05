@@ -1,5 +1,9 @@
 package ru.yandex.praktikum;
 
+import io.restassured.RestAssured;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.ValidatableResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,14 +38,14 @@ public class OrdersColorParamTest {
 
   @Before
   public void setUp() {
+    RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
     ordersClient = new OrdersClient();
   }
 
   @Test
   public void orderCreateHappyPassTest() {
     order = Order.cplorSelectOrder(color);
-    int orderTrack = ordersClient.create(order);
-    System.out.println(orderTrack);
-    assertNotEquals(0, orderTrack);
+    ValidatableResponse response = ordersClient.create(order);
+    assertNotEquals(0, (int)response.extract().path("track"));
   }
 }

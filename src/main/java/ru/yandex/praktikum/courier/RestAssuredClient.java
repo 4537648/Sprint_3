@@ -8,7 +8,7 @@ public class RestAssuredClient {
   protected final String URL = "https://qa-scooter.praktikum-services.ru/api/v1";
 
   protected final RequestSpecification reqSpec =
-          given().log().all()
+          given()
           .header("Content-Type", "application/json")
           .baseUri(URL);
 }

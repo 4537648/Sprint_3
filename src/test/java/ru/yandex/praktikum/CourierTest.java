@@ -1,5 +1,8 @@
 package ru.yandex.praktikum;
 
+import io.restassured.RestAssured;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -12,72 +15,66 @@ import static org.junit.Assert.*;
 
 public class CourierTest {
 
+  private ValidatableResponse response;
   private Courier courier;
   private CourierClient courierClient;
-  private String errMsg;
-  private int statusCode;
   private int couriedId;
 
   @Before
   public void setUp() {
+    RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
     courierClient = new CourierClient();
+    courier = Courier.getRandom();
   }
 
   @Test
   public void courierCreateHappyPassTest() {
-    courier = Courier.getRandom();
-    ValidatableResponse responce = courierClient.create(courier);
-    statusCode = responce.extract().statusCode();
-    couriedId = responce.extract().path("ok");
-    assertEquals(statusCode, 201);
-    assertNotEquals(0, couriedId);
-  }
-
-  @Test
-  public void courierCreateHappyPassTestOld() {
-    courier = Courier.getRandom();
-    boolean created = courierClient.createOld(courier);
-    couriedId = courierClient.login(CourierCredentials.from(courier));
-    assertTrue(created);
-    assertNotEquals(0, couriedId);
+    response = courierClient.create(courier);
+    couriedId = courierClient.login(CourierCredentials.from(courier)).extract().path("id");
+    assertEquals(201, response.extract().statusCode());
+    assertTrue(response.extract().path("ok"));
   }
 
   @Test
   public void courierCreateDuplicatedErrorTest() {
-    courier = Courier.getRandom();
-    boolean created = courierClient.createOld(courier);
-    couriedId = courierClient.login(CourierCredentials.from(courier));
+    response = courierClient.create(courier);
+    couriedId = courierClient.login(CourierCredentials.from(courier)).extract().path("id");
     courier.setPassword("dupePassword");
-    String createdDuplicate = courierClient.createDuplicate(courier);
-    assertEquals("Этот логин уже используется. Попробуйте другой.", createdDuplicate);
-  }
-
-  @Test
-  public void courierCreateWithoutPasswordErrorTest() {
-    courier = Courier.getRandomWithoutPassword();
-    errMsg = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
+    response = courierClient.create(courier);
+    assertEquals(409, response.extract().statusCode());
+    assertEquals("Этот логин уже используется. Попробуйте другой.", response.extract().path("message"));
   }
 
   @Test
   public void courierCreateWithoutLoginErrorTest() {
-    courier = Courier.getRandomWithoutLogin();
-    errMsg = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
+    courier.setLogin("");
+    response = courierClient.create(courier);
+    assertEquals(400, response.extract().statusCode());
+    assertEquals("Недостаточно данных для создания учетной записи", response.extract().path("message"));
   }
 
   @Test
-  public void courierCreateWithoutFirstNameErrorTest() {
-    courier = Courier.getRandomWithoutFirstName();
-    errMsg = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
+  public void courierCreateWithoutPasswordErrorTest() {
+    courier.setPassword("");
+    response = courierClient.create(courier);
+    assertEquals(400, response.extract().statusCode());
+    assertEquals("Недостаточно данных для создания учетной записи", response.extract().path("message"));
   }
+
+/*
+  @Test
+  public void courierCreateWithoutFirstNameErrorTest() {
+    courier.setFirstName("");
+    response = courierClient.create(courier);
+    assertEquals(400, response.extract().statusCode());
+    assertEquals("Недостаточно данных для создания учетной записи", response.extract().path("message"));
+  }
+*/
 
   @After
   public void tearDown() {
     if (couriedId > 0) {
       courierClient.delete(couriedId);
-      System.out.println("Test courier deleted successfully");
     }
   }
 }
