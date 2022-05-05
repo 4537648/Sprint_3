@@ -1,8 +1,7 @@
 package ru.yandex.praktikum;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
+import io.qameta.allure.Feature;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +14,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotEquals;
 
+@Feature("Параметризованные тесты создания заказа")
+@DisplayName("Параметризованные тесты создания заказа")
 @RunWith(Parameterized.class)
-public class OrdersColorParamTest {
+public class OrdersColorParamTest extends Config {
 
   private OrdersClient ordersClient;
   private Order order;
@@ -38,11 +39,12 @@ public class OrdersColorParamTest {
 
   @Before
   public void setUp() {
-    RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+    if(LogStatus) { turnOnLogging();}
     ordersClient = new OrdersClient();
   }
 
   @Test
+  @DisplayName("Проверка создания заказа с различным набором цвета")
   public void orderCreateHappyPassTest() {
     order = Order.cplorSelectOrder(color);
     ValidatableResponse response = ordersClient.create(order);

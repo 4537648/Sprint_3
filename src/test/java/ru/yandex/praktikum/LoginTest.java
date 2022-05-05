@@ -1,8 +1,7 @@
 package ru.yandex.praktikum;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
+import io.qameta.allure.Feature;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -13,7 +12,9 @@ import ru.yandex.praktikum.courier.CourierCredentials;
 
 import static org.junit.Assert.*;
 
-public class LoginTest {
+@Feature("Тесты авторизации курьера")
+@DisplayName("Тесты авторизации курьера")
+public class LoginTest extends Config {
 
   private ValidatableResponse response;
   private Courier courier;
@@ -22,7 +23,7 @@ public class LoginTest {
 
   @Before
   public void setUp() {
-    RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+    if(LogStatus) { turnOnLogging();}
     courierClient = new CourierClient();
     courier = Courier.getRandom();
     response = new CourierClient().create(courier);
@@ -32,11 +33,13 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка успешной авторизации курьера")
   public void courierLoginHappyPassTest() {
     assertNotEquals(0, couriedId);
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера без заполнения логина")
   public void courierLoginEmptyLoginErrorTest() {
     courier.setLogin("");
     response = new CourierClient().login(CourierCredentials.from(courier));
@@ -45,6 +48,7 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера без заполнения пароля")
   public void courierLoginEmptyPasswordErrorTest() {
     courier.setPassword("");
     response = new CourierClient().login(CourierCredentials.from(courier));
@@ -53,6 +57,7 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера без передачи логина")
   public void courierLoginNullLoginErrorTest() {
     courier.setLogin(null);
     response = new CourierClient().login(CourierCredentials.from(courier));
@@ -61,6 +66,7 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера без передачи пароля")
   public void courierLoginNullPasswordErrorTest() {
     courier.setPassword(null);
     response = new CourierClient().login(CourierCredentials.from(courier));
@@ -69,6 +75,7 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера с некорректным логином")
   public void courierLoginWrongLoginErrorTest() {
     courier.setLogin(courier.getLogin() + "WRONG");
     response = new CourierClient().login(CourierCredentials.from(courier));
@@ -77,6 +84,7 @@ public class LoginTest {
   }
 
   @Test
+  @DisplayName("Проверка ошибки при авторизации курьера с некорректным паролем")
   public void courierLoginWrongPasswordErrorTest() {
     courier.setPassword("wrongpassword");
     response = new CourierClient().login(CourierCredentials.from(courier));

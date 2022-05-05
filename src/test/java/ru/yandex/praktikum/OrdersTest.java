@@ -1,31 +1,31 @@
 package ru.yandex.praktikum;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.response.Response;
+import io.qameta.allure.Feature;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.orders.Order;
 import ru.yandex.praktikum.orders.OrdersClient;
 
-import java.util.List;
-
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class OrdersTest {
+@Feature("Тесты создания заказа")
+@DisplayName("Тесты создания заказа")
+public class OrdersTest extends Config {
 
   private OrdersClient ordersClient;
   private Order order;
 
   @Before
   public void setUp() {
-    RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+    if(LogStatus) { turnOnLogging();}
     ordersClient = new OrdersClient();
   }
 
   @Test
+  @DisplayName("Проверка успешного создания заказа")
   public void orderCreateHappyPassTest() {
     order = Order.defaultOrder();
     ValidatableResponse response = ordersClient.create(order);
@@ -33,9 +33,11 @@ public class OrdersTest {
   }
 
   @Test
-  public void orderList() {
-    Response response = ordersClient.list();
-    List<String> jsonResponse = response.jsonPath().getList("orders.id");
-    System.out.println(jsonResponse.toString());
-  }
+  @DisplayName("Проверка успешного получения списка всех заказов")
+  public void orderListTest() {
+    ValidatableResponse response = ordersClient.list();
+    assertEquals(
+            (response.extract().jsonPath().getList("orders")).size(),
+            (response.extract().jsonPath().getList("orders.id")).size());
+    }
 }

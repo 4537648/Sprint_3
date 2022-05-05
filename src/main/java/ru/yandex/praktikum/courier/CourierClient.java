@@ -1,6 +1,7 @@
 package ru.yandex.praktikum.courier;
 
 import io.restassured.response.ValidatableResponse;
+import ru.yandex.praktikum.RestAssuredClient;
 
 public class CourierClient extends RestAssuredClient {
 

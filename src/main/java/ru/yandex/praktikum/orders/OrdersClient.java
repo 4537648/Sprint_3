@@ -3,8 +3,7 @@ package ru.yandex.praktikum.orders;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
-import ru.yandex.praktikum.courier.Courier;
-import ru.yandex.praktikum.courier.RestAssuredClient;
+import ru.yandex.praktikum.RestAssuredClient;
 
 public class OrdersClient extends RestAssuredClient {
 
@@ -13,7 +12,7 @@ public class OrdersClient extends RestAssuredClient {
   private final String TRACK_ID = TRACK + "?t={trackId}";
 
   public ValidatableResponse create(Order order) {
-    return (ValidatableResponse) reqSpec
+    return reqSpec
             .body(order)
             .when()
             .post(ROOT)
@@ -44,7 +43,15 @@ public class OrdersClient extends RestAssuredClient {
             .path("order.id");
   }
 
-  public Response list() {
+  public ValidatableResponse list() {
+    return reqSpec
+            .when()
+            .get(ROOT)
+            .then();
+  }
+
+
+  public Response listOld() {
      return reqSpec
             .when()
             .get(ROOT)

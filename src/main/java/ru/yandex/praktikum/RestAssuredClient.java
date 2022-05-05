@@ -1,4 +1,4 @@
-package ru.yandex.praktikum.courier;
+package ru.yandex.praktikum;
 
 import io.restassured.specification.RequestSpecification;
 import static io.restassured.RestAssured.given;
