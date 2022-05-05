@@ -1,5 +1,6 @@
 package ru.yandex.praktikum;
 
+import io.restassured.response.ValidatableResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,8 @@ public class CourierTest {
 
   private Courier courier;
   private CourierClient courierClient;
+  private String errMsg;
+  private int statusCode;
   private int couriedId;
 
   @Before
@@ -21,18 +24,28 @@ public class CourierTest {
   }
 
   @Test
-  public void courierCreationHappyPassTest() {
+  public void courierCreateHappyPassTest() {
     courier = Courier.getRandom();
-    boolean created = courierClient.create(courier);
+    ValidatableResponse responce = courierClient.create(courier);
+    statusCode = responce.extract().statusCode();
+    couriedId = responce.extract().path("ok");
+    assertEquals(statusCode, 201);
+    assertNotEquals(0, couriedId);
+  }
+
+  @Test
+  public void courierCreateHappyPassTestOld() {
+    courier = Courier.getRandom();
+    boolean created = courierClient.createOld(courier);
     couriedId = courierClient.login(CourierCredentials.from(courier));
     assertTrue(created);
     assertNotEquals(0, couriedId);
   }
 
   @Test
-  public void courierDuplicatedCreationErrorTest() {
+  public void courierCreateDuplicatedErrorTest() {
     courier = Courier.getRandom();
-    boolean created = courierClient.create(courier);
+    boolean created = courierClient.createOld(courier);
     couriedId = courierClient.login(CourierCredentials.from(courier));
     courier.setPassword("dupePassword");
     String createdDuplicate = courierClient.createDuplicate(courier);
@@ -40,24 +53,24 @@ public class CourierTest {
   }
 
   @Test
-  public void courierWOPasswordErrorTest() {
+  public void courierCreateWithoutPasswordErrorTest() {
     courier = Courier.getRandomWithoutPassword();
-    String created = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", created);
+    errMsg = courierClient.createWithoutFullCreds(courier);
+    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
   }
 
   @Test
-  public void courierWOLoginErrorTest() {
+  public void courierCreateWithoutLoginErrorTest() {
     courier = Courier.getRandomWithoutLogin();
-    String created = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", created);
+    errMsg = courierClient.createWithoutFullCreds(courier);
+    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
   }
 
   @Test
-  public void courierWOfirstNameErrorTest() {
+  public void courierCreateWithoutFirstNameErrorTest() {
     courier = Courier.getRandomWithoutFirstName();
-    String created = courierClient.createWithoutFullCreds(courier);
-    assertEquals("Недостаточно данных для создания учетной записи", created);
+    errMsg = courierClient.createWithoutFullCreds(courier);
+    assertEquals("Недостаточно данных для создания учетной записи", errMsg);
   }
 
   @After
