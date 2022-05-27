@@ -6,7 +6,7 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 
 public class Config {
 
-  public static final boolean LogStatus = false;
+  public static final boolean LOG_STATUS = true;
 
   public void turnOnLogging() {
     RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());

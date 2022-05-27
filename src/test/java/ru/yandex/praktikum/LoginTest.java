@@ -23,7 +23,7 @@ public class LoginTest extends Config {
 
   @Before
   public void setUp() {
-    if(LogStatus) { turnOnLogging();}
+    if(LOG_STATUS) { turnOnLogging();}
     courierClient = new CourierClient();
     courier = Courier.getRandom();
     response = new CourierClient().create(courier);

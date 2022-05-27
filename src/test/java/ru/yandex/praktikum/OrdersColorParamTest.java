@@ -39,7 +39,7 @@ public class OrdersColorParamTest extends Config {
 
   @Before
   public void setUp() {
-    if(LogStatus) { turnOnLogging();}
+    if(LOG_STATUS) { turnOnLogging();}
     ordersClient = new OrdersClient();
   }
 

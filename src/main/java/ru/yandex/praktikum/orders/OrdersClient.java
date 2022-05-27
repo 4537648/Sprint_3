@@ -9,7 +9,6 @@ public class OrdersClient extends RestAssuredClient {
 
   private final String ROOT = "/orders";
   private final String TRACK = ROOT + "/track";
-  private final String TRACK_ID = TRACK + "?t={trackId}";
 
   public ValidatableResponse create(Order order) {
     return reqSpec
@@ -33,9 +32,9 @@ public class OrdersClient extends RestAssuredClient {
 
   public int track(int trackId) {
     return reqSpec
-            .pathParams("trackId", trackId)
+            .queryParam("t", trackId)
             .when()
-            .get(TRACK_ID)
+            .get(TRACK)
             .then().log().all()
             .assertThat()
             .statusCode(200)
@@ -50,14 +49,13 @@ public class OrdersClient extends RestAssuredClient {
             .then();
   }
 
-
   public Response listOld() {
-     return reqSpec
+    return reqSpec
             .when()
             .get(ROOT)
             .then().contentType(ContentType.JSON)
-             .extract()
-             .response();
+            .extract()
+            .response();
   }
 
-  }
+}

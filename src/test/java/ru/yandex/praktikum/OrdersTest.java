@@ -20,7 +20,7 @@ public class OrdersTest extends Config {
 
   @Before
   public void setUp() {
-    if(LogStatus) { turnOnLogging();}
+    if(LOG_STATUS) { turnOnLogging();}
     ordersClient = new OrdersClient();
   }
 
@@ -39,5 +39,14 @@ public class OrdersTest extends Config {
     assertEquals(
             (response.extract().jsonPath().getList("orders")).size(),
             (response.extract().jsonPath().getList("orders.id")).size());
+    /*
+    я исхожу из того, что если мы получаем массив orders,
+    то сколько бы ни было в нем объектов, мы должны получить
+    такое же количество ключевого параметра объекта - таковым я выбрал id
+    если придет пустой массив, значит в системе нет заказов, и проверка будет успешной
+    не вижу в этом противоречий, так как в спеке не заявлено, что заказов не может быть ноль
+    больше идей, к сожалению, не возникло
+     */
+
     }
 }

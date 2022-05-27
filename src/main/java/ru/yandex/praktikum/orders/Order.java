@@ -1,8 +1,10 @@
 package ru.yandex.praktikum.orders;
 
+import com.github.javafaker.Faker;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Locale;
 
 @Data
 public class Order {
@@ -15,6 +17,8 @@ public class Order {
   private String deliveryDate;
   private String comment;
   private List<String> color;
+
+  static Faker faker = new Faker(new Locale("ru"));
 
   public Order(String firstName, String lastName, String address, int metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
     this.firstName = firstName;
@@ -30,11 +34,11 @@ public class Order {
 
   public static Order defaultOrder() {
     return new Order(
-            "Naruto",
-            "Uchiha",
-            "Konoha, 142 apt.",
+            faker.name().firstName(),
+            faker.name().lastName(),
+            faker.address().streetAddress(),
             4,
-            "+7 800 355 35 35",
+            faker.phoneNumber().cellPhone(),
             5,
             "2020-06-06",
             "Saske, come back to Konoha",
@@ -44,14 +48,14 @@ public class Order {
 
   public static Order cplorSelectOrder(List<String> color) {
    return new Order(
-           "Naruto",
-           "Uchiha",
-           "Konoha, 142 apt.",
+           faker.name().firstName(),
+           faker.name().lastName(),
+           faker.address().streetAddress(),
            4,
-           "+7 800 355 35 35",
+           faker.phoneNumber().cellPhone(),
            5,
            "2020-06-06",
-           "Saske, come back to Konoha",
+           faker.backToTheFuture().quote(),
            color);
   }
 }
